@@ -1,3 +1,6 @@
+#include <string>
+#include <vector>
+
 namespace ptk {
 enum class RangeType { SPACE, DIMENSION };
 
@@ -23,4 +26,16 @@ public:
   RangeType GetType() const { return Type; }
   RangeWidth GetWidth() const { return Width; }
 };
+
+using RangeVector = std::vector<std::pair<std::string, Range>>;
+
+class RangeContainer {
+private:
+  RangeVector Ranges;
+
+public:
+  void Insert(std::string, Range);
+  const RangeVector &GetRanges() const { return Ranges; }
+};
+
 } // namespace ptk
