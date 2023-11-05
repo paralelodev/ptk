@@ -15,18 +15,25 @@ static std::string GetWidthAsString(RangeWidth Width) {
   }
 }
 
+static void GenerateLoops(Kernel &K) {
+  for (auto &&[Ind, Range] : K.GetRanges()) {
+    std::cout << fmt::format(
+        "  for ( {0} {1} = {2}; {1} < {3}; {1} += {4} ) {{\n"
+        "    \n",
+        GetWidthAsString(Range.GetWidth()), Ind, Range.GetLowerbound(),
+        Range.GetUpperbound(), Range.GetStride());
+  }
+
+  for (int i = 0; i < K.GetRanges().size(); i++) {
+    std::cout << "  }\n";
+  }
+}
+
 static void GenerateCPUCode(Kernel &K, ComputingUnit TargetCU) {
   switch (TargetCU) {
   case ComputingUnit::THREAD:
-    for (auto &&[Ind, Range] : K.GetRanges()) {
-      std::cout << fmt::format(
-          "  #pragma omp parallel for\n"
-          "  for ( {0} {1} = {2}; {1} < {3}; {1} += {4} ) {{\n"
-          "  \n"
-          "  }}\n",
-          GetWidthAsString(Range.GetWidth()), Ind, Range.GetLowerbound(),
-          Range.GetUpperbound(), Range.GetStride());
-    }
+    std::cout << "  #pragma omp parallel for\n";
+    GenerateLoops(K);
     break;
   default:
     break;
@@ -36,15 +43,8 @@ static void GenerateCPUCode(Kernel &K, ComputingUnit TargetCU) {
 static void GenerateAccelCode(Kernel &K, ComputingUnit TargetCU) {
   switch (TargetCU) {
   case ptk::ComputingUnit::TEAM:
-    for (auto &&[Ind, Range] : K.GetRanges()) {
-      std::cout << fmt::format(
-          "  #pragma omp target teams distribute\n"
-          "  for ( {0} {1} = {2}; {1} < {3}; {1} += {4} ) {{\n"
-          "  \n"
-          "  }}\n",
-          GetWidthAsString(Range.GetWidth()), Ind, Range.GetLowerbound(),
-          Range.GetUpperbound(), Range.GetStride());
-    }
+    std::cout << "  #pragma omp target teams distribute\n";
+    GenerateLoops(K);
     break;
   default:
     break;

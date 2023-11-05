@@ -9,6 +9,7 @@ int main() {
     ComputingDistribution CU = {ComputingUnit::CPU, ComputingUnit::THREAD};
     RangeContainer Ranges;
     Ranges.Insert("i", {0, 100, 1, RangeType::SPACE, RangeWidth::INTEGER});
+    Ranges.Insert("j", {0, 100, 1, RangeType::SPACE, RangeWidth::INTEGER});
 
     Kernel K(Name, CU, Ranges);
 
