@@ -1,19 +1,26 @@
 namespace ptk {
 enum class RangeType { SPACE, DIMENSION };
 
-template <typename T> class Range {
+enum class RangeWidth { INTEGER, LONG };
+
+class Range {
 private:
-  T Lowerbound;
-  T Upperbound;
-  T Stride;
+  long Lowerbound;
+  long Upperbound;
+  long Stride;
   RangeType Type;
+  RangeWidth Width;
 
 public:
-  Range(T lowerbound, T upperbound, T stride, RangeType type)
+  Range(long lowerbound, long upperbound, long stride, RangeType type,
+        RangeWidth width)
       : Lowerbound(lowerbound), Upperbound(upperbound), Stride(stride),
-        Type(type) {}
-  T GetLowerbound() const { return Lowerbound; }
-  T GetUpperbound() const { return Upperbound; }
-  T GetStride() const { return Stride; }
+        Type(type), Width(width) {}
+
+  long GetLowerbound() const { return Lowerbound; }
+  long GetUpperbound() const { return Upperbound; }
+  long GetStride() const { return Stride; }
+  RangeType GetType() const { return Type; }
+  RangeWidth GetWidth() const { return Width; }
 };
 } // namespace ptk

@@ -17,4 +17,5 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 include_directories(include/ast)
 include_directories(include/codegen/)
 
+add_subdirectory(lib/codegen/c++)
 add_subdirectory(test)
