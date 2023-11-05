@@ -1,4 +1,6 @@
 #include "c++/Generator.h"
+
+#include <fmt/core.h>
 #include <iostream>
 
 namespace ptk {
@@ -23,10 +25,13 @@ void GenerateKernel(Kernel &K) {
     switch (Distribution.Target) {
     case ptk::ComputingUnit::THREAD:
       for (auto [ind, range] : K.GetRanges()) {
-        std::cout << "  for( " << GetWidthAsString(range.GetWidth()) << ' '
-                  << ind << " = " << range.GetLowerbound() << "; " << ind
-                  << " < " << range.GetUpperbound() << "; " << ind
-                  << " += " << range.GetStride() << " ){\n  \n  }\n";
+        std::cout << fmt::format(
+            "  #pragma omp parallel for\n"
+            "  for ( {0} {1} = {2}; {1} < {3}; {1} += {4} ) {{\n"
+            "  \n"
+            "  }}\n",
+            GetWidthAsString(range.GetWidth()), ind, range.GetLowerbound(),
+            range.GetUpperbound(), range.GetStride());
       }
       break;
     default:
