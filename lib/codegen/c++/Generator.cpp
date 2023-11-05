@@ -18,7 +18,7 @@ static std::string GetWidthAsString(RangeWidth Width) {
 void GenerateKernel(Kernel &K) {
   auto [Source, Target] = K.GetDistribution();
 
-  std::cout << "void " << K.GetName() << '{' << '\n';
+  std::cout << fmt::format("void {0} () {{\n", K.GetName());
 
   switch (Source) {
   case ptk::ComputingUnit::CPU:
