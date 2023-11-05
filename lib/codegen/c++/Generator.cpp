@@ -16,22 +16,22 @@ static std::string GetWidthAsString(RangeWidth Width) {
 }
 
 void GenerateKernel(Kernel &K) {
-  const ComputingDistribution &Distribution = K.GetDistribution();
+  auto [Source, Target] = K.GetDistribution();
 
   std::cout << "void " << K.GetName() << '{' << '\n';
 
-  switch (Distribution.Source) {
+  switch (Source) {
   case ptk::ComputingUnit::CPU:
-    switch (Distribution.Target) {
+    switch (Target) {
     case ptk::ComputingUnit::THREAD:
-      for (auto [ind, range] : K.GetRanges()) {
+      for (auto [Ind, Range] : K.GetRanges()) {
         std::cout << fmt::format(
             "  #pragma omp parallel for\n"
             "  for ( {0} {1} = {2}; {1} < {3}; {1} += {4} ) {{\n"
             "  \n"
             "  }}\n",
-            GetWidthAsString(range.GetWidth()), ind, range.GetLowerbound(),
-            range.GetUpperbound(), range.GetStride());
+            GetWidthAsString(Range.GetWidth()), Ind, Range.GetLowerbound(),
+            Range.GetUpperbound(), Range.GetStride());
       }
       break;
     default:
@@ -39,16 +39,16 @@ void GenerateKernel(Kernel &K) {
     }
     break;
   case ptk::ComputingUnit::ACCEL:
-    switch (Distribution.Target) {
+    switch (Target) {
     case ptk::ComputingUnit::TEAM:
-      for (auto [ind, range] : K.GetRanges()) {
+      for (auto [Ind, Range] : K.GetRanges()) {
         std::cout << fmt::format(
             "  #pragma omp target teams distribute\n"
             "  for ( {0} {1} = {2}; {1} < {3}; {1} += {4} ) {{\n"
             "  \n"
             "  }}\n",
-            GetWidthAsString(range.GetWidth()), ind, range.GetLowerbound(),
-            range.GetUpperbound(), range.GetStride());
+            GetWidthAsString(Range.GetWidth()), Ind, Range.GetLowerbound(),
+            Range.GetUpperbound(), Range.GetStride());
       }
       break;
     default:
