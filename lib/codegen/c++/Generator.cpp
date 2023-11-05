@@ -38,6 +38,23 @@ void GenerateKernel(Kernel &K) {
       break;
     }
     break;
+  case ptk::ComputingUnit::ACCEL:
+    switch (Distribution.Target) {
+    case ptk::ComputingUnit::TEAM:
+      for (auto [ind, range] : K.GetRanges()) {
+        std::cout << fmt::format(
+            "  #pragma omp target teams distribute\n"
+            "  for ( {0} {1} = {2}; {1} < {3}; {1} += {4} ) {{\n"
+            "  \n"
+            "  }}\n",
+            GetWidthAsString(range.GetWidth()), ind, range.GetLowerbound(),
+            range.GetUpperbound(), range.GetStride());
+      }
+      break;
+    default:
+      break;
+    }
+    break;
   default:
     break;
   }
