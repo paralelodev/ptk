@@ -18,7 +18,7 @@ static std::string GetWidthAsString(RangeWidth Width) {
 static void GenerateCPUCode(Kernel &K, ComputingUnit TargetCU) {
   switch (TargetCU) {
   case ComputingUnit::THREAD:
-    for (auto [Ind, Range] : K.GetRanges()) {
+    for (auto &&[Ind, Range] : K.GetRanges()) {
       std::cout << fmt::format(
           "  #pragma omp parallel for\n"
           "  for ( {0} {1} = {2}; {1} < {3}; {1} += {4} ) {{\n"
@@ -36,7 +36,7 @@ static void GenerateCPUCode(Kernel &K, ComputingUnit TargetCU) {
 static void GenerateAccelCode(Kernel &K, ComputingUnit TargetCU) {
   switch (TargetCU) {
   case ptk::ComputingUnit::TEAM:
-    for (auto [Ind, Range] : K.GetRanges()) {
+    for (auto &&[Ind, Range] : K.GetRanges()) {
       std::cout << fmt::format(
           "  #pragma omp target teams distribute\n"
           "  for ( {0} {1} = {2}; {1} < {3}; {1} += {4} ) {{\n"
