@@ -14,7 +14,7 @@ int main() {
 
     Kernel K(Name, CU, Ranges);
 
-    GenerateKernel(K);
+    GenerateKernel(std::cout, K);
   }
   {
     string Name = "test_gpu";
@@ -24,6 +24,6 @@ int main() {
 
     Kernel K(Name, CU, Ranges);
 
-    GenerateKernel(K);
+    GenerateKernel(std::cout, K);
   }
 }

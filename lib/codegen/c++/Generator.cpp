@@ -1,7 +1,6 @@
 #include "c++/Generator.h"
 
 #include <fmt/core.h>
-#include <iostream>
 
 namespace ptk {
 
@@ -15,42 +14,42 @@ static std::string GetWidthAsString(RangeWidth Width) {
   }
 }
 
-static void GenerateLoops(Kernel &K) {
+static void GenerateLoops(std::ostream &Out, Kernel &K) {
   for (auto &&[Ind, Range] : K.GetRanges()) {
-    std::cout << fmt::format(
-        "  for ( {0} {1} = {2}; {1} < {3}; {1} += {4} ) {{\n"
-        "    \n",
-        GetWidthAsString(Range.GetWidth()), Ind, Range.GetLowerbound(),
-        Range.GetUpperbound(), Range.GetStride());
+    Out << fmt::format("  for ( {0} {1} = {2}; {1} < {3}; {1} += {4} ) {{\n"
+                       "    \n",
+                       GetWidthAsString(Range.GetWidth()), Ind,
+                       Range.GetLowerbound(), Range.GetUpperbound(),
+                       Range.GetStride());
   }
 
   for (int i = 0; i < K.GetRanges().size(); i++) {
-    std::cout << "  }\n";
+    Out << "  }\n";
   }
 }
 
-static void GenerateCollapse(Kernel &K) {
+static void GenerateCollapse(std::ostream &Out, Kernel &K) {
   short CollapseLevel = K.GetCollapseLevel();
-  std::cout << (CollapseLevel > 1
-                    ? fmt::format(" collapse({0})\n", CollapseLevel)
-                    : "\n");
+  Out << (CollapseLevel > 1 ? fmt::format(" collapse({0})\n", CollapseLevel)
+                            : "\n");
 }
 
-static void GenerateCollapsedLoops(Kernel &K) {
-  GenerateCollapse(K);
-  GenerateLoops(K);
+static void GenerateCollapsedLoops(std::ostream &Out, Kernel &K) {
+  GenerateCollapse(Out, K);
+  GenerateLoops(Out, K);
 }
 
-static void GenerateCollapsedLoopsWithDirective(Kernel &K,
+static void GenerateCollapsedLoopsWithDirective(std::ostream &Out, Kernel &K,
                                                 std::string_view Directive) {
-  std::cout << Directive;
-  GenerateCollapsedLoops(K);
+  Out << Directive;
+  GenerateCollapsedLoops(Out, K);
 }
 
-static void GenerateCPUCode(Kernel &K, ComputingUnit TargetCU) {
+static void GenerateCPUCode(std::ostream &Out, Kernel &K,
+                            ComputingUnit TargetCU) {
   switch (TargetCU) {
   case ComputingUnit::THREAD: {
-    GenerateCollapsedLoopsWithDirective(K, "#pragma omp parallel for");
+    GenerateCollapsedLoopsWithDirective(Out, K, "#pragma omp parallel for");
     break;
   }
   default:
@@ -58,10 +57,11 @@ static void GenerateCPUCode(Kernel &K, ComputingUnit TargetCU) {
   }
 }
 
-static void GenerateAccelCode(Kernel &K, ComputingUnit TargetCU) {
+static void GenerateAccelCode(std::ostream &Out, Kernel &K,
+                              ComputingUnit TargetCU) {
   switch (TargetCU) {
   case ptk::ComputingUnit::TEAM: {
-    GenerateCollapsedLoopsWithDirective(K,
+    GenerateCollapsedLoopsWithDirective(Out, K,
                                         "#pragma omp target teams distribute");
     break;
   }
@@ -70,22 +70,22 @@ static void GenerateAccelCode(Kernel &K, ComputingUnit TargetCU) {
   }
 }
 
-void GenerateKernel(Kernel &K) {
+void GenerateKernel(std::ostream &Out, Kernel &K) {
   auto [SourceCU, TargetCU] = K.GetDistribution();
 
-  std::cout << fmt::format("void {0} () {{\n", K.GetName());
+  Out << fmt::format("void {0} () {{\n", K.GetName());
 
   switch (SourceCU) {
   case ptk::ComputingUnit::CPU:
-    GenerateCPUCode(K, TargetCU);
+    GenerateCPUCode(Out, K, TargetCU);
     break;
   case ptk::ComputingUnit::ACCEL:
-    GenerateAccelCode(K, TargetCU);
+    GenerateAccelCode(Out, K, TargetCU);
     break;
   default:
     break;
   }
 
-  std::cout << '}' << '\n';
+  Out << '}' << '\n';
 }
 } // namespace ptk
