@@ -11,6 +11,16 @@ void RangeContainer::Insert(std::string newInd, Range newRange) {
     }
   }
 
+  if (newRange.GetType() == RangeType::SPACE) {
+    if (!Ranges.empty() &&
+        Ranges.back().second.GetType() == RangeType::DIMENSION) {
+      std::cerr << "Error: The range must be a dimension\n";
+      exit(0);
+    }
+
+    CollapseLevel++;
+  }
+
   Ranges.push_back({newInd, newRange});
 }
 } // namespace ptk

@@ -29,12 +29,30 @@ static void GenerateLoops(Kernel &K) {
   }
 }
 
+static void GenerateCollapse(Kernel &K) {
+  short CollapseLevel = K.GetCollapseLevel();
+  std::cout << (CollapseLevel > 1
+                    ? fmt::format(" collapse({0})\n", CollapseLevel)
+                    : "\n");
+}
+
+static void GenerateCollapsedLoops(Kernel &K) {
+  GenerateCollapse(K);
+  GenerateLoops(K);
+}
+
+static void GenerateCollapsedLoopsWithDirective(Kernel &K,
+                                                std::string_view Directive) {
+  std::cout << Directive;
+  GenerateCollapsedLoops(K);
+}
+
 static void GenerateCPUCode(Kernel &K, ComputingUnit TargetCU) {
   switch (TargetCU) {
-  case ComputingUnit::THREAD:
-    std::cout << "  #pragma omp parallel for\n";
-    GenerateLoops(K);
+  case ComputingUnit::THREAD: {
+    GenerateCollapsedLoopsWithDirective(K, "#pragma omp parallel for");
     break;
+  }
   default:
     break;
   }
@@ -42,10 +60,11 @@ static void GenerateCPUCode(Kernel &K, ComputingUnit TargetCU) {
 
 static void GenerateAccelCode(Kernel &K, ComputingUnit TargetCU) {
   switch (TargetCU) {
-  case ptk::ComputingUnit::TEAM:
-    std::cout << "  #pragma omp target teams distribute\n";
-    GenerateLoops(K);
+  case ptk::ComputingUnit::TEAM: {
+    GenerateCollapsedLoopsWithDirective(K,
+                                        "#pragma omp target teams distribute");
     break;
+  }
   default:
     break;
   }

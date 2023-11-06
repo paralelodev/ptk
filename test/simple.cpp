@@ -10,6 +10,7 @@ int main() {
     RangeContainer Ranges;
     Ranges.Insert("i", {0, 100, 1, RangeType::SPACE, RangeWidth::INTEGER});
     Ranges.Insert("j", {0, 100, 1, RangeType::SPACE, RangeWidth::INTEGER});
+    Ranges.Insert("k", {0, 100, 1, RangeType::DIMENSION, RangeWidth::INTEGER});
 
     Kernel K(Name, CU, Ranges);
 

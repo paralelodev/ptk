@@ -32,10 +32,12 @@ using RangeVector = std::vector<std::pair<std::string, Range>>;
 class RangeContainer {
 private:
   RangeVector Ranges;
+  short CollapseLevel = 0;
 
 public:
   void Insert(std::string, Range);
   const RangeVector &GetRanges() const { return Ranges; }
+  short GetCollapseLevel() const { return CollapseLevel; }
 };
 
 } // namespace ptk

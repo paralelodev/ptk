@@ -18,5 +18,6 @@ public:
   std::string &GetName() const { return Name; }
   ComputingDistribution &GetDistribution() const { return Distribution; }
   const RangeVector &GetRanges() const { return Ranges.GetRanges(); }
+  short GetCollapseLevel() const { return Ranges.GetCollapseLevel(); }
 };
 } // namespace ptk
