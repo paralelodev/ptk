@@ -39,9 +39,13 @@ static void GenerateCollapsedLoops(std::ostream &Out, Kernel &K) {
   GenerateLoops(Out, K);
 }
 
+static void GenerateDirective(std::ostream &Out, std::string_view Directive) {
+  Out << Directive;
+}
+
 static void GenerateCollapsedLoopsWithDirective(std::ostream &Out, Kernel &K,
                                                 std::string_view Directive) {
-  Out << Directive;
+  GenerateDirective(Out, Directive);
   GenerateCollapsedLoops(Out, K);
 }
 
